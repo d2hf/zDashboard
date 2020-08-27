@@ -1,5 +1,22 @@
 import AWS from 'aws-sdk';
 import embed from 'vega-embed';
+import Auth from "@aws-amplify/auth";
+
+Auth.configure({
+    region: 'us-east-1',
+    userPoolId: 'us-east-1_qxqYDrRYz',
+    userPoolWebClientId: '2ghd3u701ls9mc66ht68g4p7cn',
+    identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
+});
+
+async function signOut() {
+    try {
+        await Auth.signOut();
+    } catch (error) {
+    console.error('Error signing out.');
+    console.error(error);
+    }
+}
 
 function getLast5Days () {
     var result = [];
@@ -243,19 +260,26 @@ function generateWeightPlot(data, dateArray) {
     embed('#weightVis', jsonVega);
 }
 
-function getItens() {
+async function getItens() {
     // configures DB query
     var dateArray = getLast5Days();
     var params = generateParams(dateArray);
 
-    var creds = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
-    });
-
-    AWS.config.credentials = creds;
     AWS.config.update({region: "us-east-1"});
 
-    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+    try {
+        const user = await Auth.currentCredentials();
+        var credentials = new AWS.Credentials({
+            accessKeyId: user.accessKeyId,
+            secretAccessKey: user.secretAccessKey,
+            sessionToken: user.sessionToken
+        });
+    } catch (err) {
+        console.error('Unable to retrieve credentials.');
+        console.error(err);
+    }
+
+    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10', credentials});
 
     dynamodb.batchGetItem(params, function(err, data) {
         /*
@@ -271,6 +295,9 @@ function getItens() {
         }
     });
 }
+
+document.getElementById('btnSignOut').addEventListener('click', signOut);
+
 generateEmptySalesPlot();
 generateEmptyBilledPlot();
 generateEmptyWeightPlot();

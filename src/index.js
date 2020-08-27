@@ -1,4 +1,12 @@
 import AWS from 'aws-sdk';
+import Auth from '@aws-amplify/auth';
+
+Auth.configure({
+    region: 'us-east-1',
+    userPoolId: 'us-east-1_qxqYDrRYz',
+    userPoolWebClientId: '2ghd3u701ls9mc66ht68g4p7cn',
+    identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
+});
 
 function processForm() {
     // retrieves data from forms
@@ -11,16 +19,22 @@ function processForm() {
     putInDataBase(totalSold, totalBilled, weightBilled);
 }
 
-const putInDataBase = (totalSold, totalBilled, weightBilled) => {
-
-    var creds = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
-    });
-
-    AWS.config.credentials = creds;
+async function putInDataBase(totalSold, totalBilled, weightBilled) {
     AWS.config.update({region: "us-east-1"});
 
-    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+    try {
+        const user = await Auth.currentCredentials();
+        var credentials = new AWS.Credentials({
+            accessKeyId: user.accessKeyId,
+            secretAccessKey: user.secretAccessKey,
+            sessionToken: user.sessionToken
+        });
+    } catch (err) {
+        console.error('Unable to retrieve credentials.');
+        console.error(err);
+    }
+
+    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10', credentials});
 
     const date = new Date();
     const timestamp = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
