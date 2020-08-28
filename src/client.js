@@ -18,6 +18,36 @@ async function signOut() {
     }
 }
 
+function getDaysOfMonth () {
+    // set output data for function
+    let dateArray = [];
+    let timestamp;
+
+    // set date params for loop
+    let actualDate = new Date();
+    let month = actualDate.getMonth();
+    let year = actualDate.getFullYear();
+
+    // gets first day of current month
+    let d = new Date(year, month, 1);
+
+    // iterates over dates
+    // if weekday push to vector
+    while (d.getMonth() === month){
+        // if weekday
+        if (d.getDay() != 6 && d.getDay() != 0){
+            // gets date info
+            timestamp = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+
+            // pushes to array
+            dateArray.push( timestamp );
+        }
+        // gets next date
+        d.setDate(d.getDate() + 1);
+    }
+    return (dateArray);
+}
+
 function getLast5Days () {
     var result = [];
     for (var i=0; i<5; i++) {
@@ -30,33 +60,24 @@ function getLast5Days () {
     return(result);
 }
 
-function generateParams (dateArray) {
-    var arrayLastDays = getLast5Days();
+
+function generateParams() {
+    let dates = getDaysOfMonth();
+    let loopLength = dates.length;
     var params = getJsonBase();
-    for (var i=0; i<4; i++) {
-        params['RequestItems']['zdashboard']['Keys'][i]['idRelatorio']['S'] = dateArray[i];
+
+    for (var i=0; i<loopLength; i++) {
+        params['RequestItems']['zdashboard']['Keys'].push({'idRelatorio': {'S': dates[i]}});
     }
     return (params);
 }
+
 
 function getJsonBase() {
     var params = {
         RequestItems: {
             "zdashboard": {
-                Keys: [
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    }
-                ]
+                Keys: []
             }
         }};
     return( params );
@@ -263,7 +284,8 @@ function generateWeightPlot(data, dateArray) {
 async function getItens() {
     // configures DB query
     var dateArray = getLast5Days();
-    var params = generateParams(dateArray);
+    var params = generateParams();
+    console.log(params);
 
     AWS.config.update({region: "us-east-1"});
 
@@ -289,9 +311,10 @@ async function getItens() {
         if (err) {
             console.log("Error", err);
         } else {
-            generateSalesPlot(data, dateArray);
-            generateBilledPlot(data, dateArray);
-            generateWeightPlot(data, dateArray);
+            console.log(data);
+            //generateSalesPlot(data, dateArray);
+            //generateBilledPlot(data, dateArray);
+            //generateWeightPlot(data, dateArray);
         }
     });
 }
