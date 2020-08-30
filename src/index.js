@@ -13,13 +13,21 @@ function processForm() {
     var totalSold = document.getElementById("salesTotal").value;
     var totalBilled = document.getElementById("billedTotal").value;
     var weightBilled = document.getElementById("weightBilled").value;
+    var inputJuliana = document.getElementById("inputJuliana").value;
+    var inputAnderson = document.getElementById("inputAnderson").value;
+    var inputBoaIdeia = document.getElementById("inputBoaIdeia").value;
+    var inputFerronato = document.getElementById("inputFerronato").value;
+    var inputMaxel = document.getElementById("inputMaxel").value;
+    var inputSagrima = document.getElementById("inputSagrima").value;
+
 
     // adds data to dynamoDB
-    //alert(`Total Sold: ${totalSold}\nTotal Billed: ${totalBilled}\nWeight Billed: ${weightBilled}`);
-    putInDataBase(totalSold, totalBilled, weightBilled);
+    putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana, inputBianfer, inputAnderson,
+        inputBoaIdeia, inputFerronato, inputMaxel, inputSagrima);
 }
 
-async function putInDataBase(totalSold, totalBilled, weightBilled) {
+async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana, inputBianfer,
+                             inputAnderson, inputBoaIdeia, inputFerronato, inputMaxel, inputSagrima) {
     AWS.config.update({region: "us-east-1"});
 
     try {
@@ -55,7 +63,28 @@ async function putInDataBase(totalSold, totalBilled, weightBilled) {
             },
             "createdAt": {
                 S: timestamp
-            }
+            },
+            "inputJuliana": {
+                S: inputJuliana.toString()
+            },
+            "inputBianfer": {
+                S: inputBianfer.toString()
+            },
+            "inputAnderson": {
+                S: inputAnderson.toString()
+            },
+            "inputBoaIdeia": {
+                S: inputBoaIdeia.toString()
+            },
+            "inputFerronato": {
+                S: inputFerronato.toString()
+            },
+            "inputMaxel": {
+                S: inputMaxel.toString()
+            },
+            "inputSagrima": {
+                S: inputMaxel.toString()
+            },
         },
         ReturnConsumedCapacity: "TOTAL",
         TableName: "zdashboard"

@@ -1,6 +1,14 @@
 import AWS from 'aws-sdk';
 import embed from 'vega-embed';
 import Auth from "@aws-amplify/auth";
+import Chart from 'chart.js';
+
+
+/*
+
+GENERAL CONFIGURATION
+
+ */
 
 Auth.configure({
     region: 'us-east-1',
@@ -18,153 +26,155 @@ async function signOut() {
     }
 }
 
-function getLast5Days () {
-    var result = [];
-    for (var i=0; i<5; i++) {
-        var d = new Date();
-        d.setDate(d.getDate() - i);
-        var timestamp = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
-        result.push( timestamp )
-    }
+function getDaysOfMonth () {
+    // set output data for function
+    let dateArray = [];
+    let timestamp;
 
-    return(result);
+    // set date params for loop
+    let actualDate = new Date();
+    let month = actualDate.getMonth();
+    let year = actualDate.getFullYear();
+
+    // gets first day of current month
+    let d = new Date(year, month, 1);
+
+    // iterates over dates
+    // if weekday push to vector
+    while (d.getMonth() === month){
+        // if weekday
+        if (d.getDay() != 6 && d.getDay() != 0){
+            // gets date info
+            timestamp = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+
+            // pushes to array
+            dateArray.push( timestamp );
+        }
+        // gets next date
+        d.setDate(d.getDate() + 1);
+    }
+    return (dateArray);
 }
 
-function generateParams (dateArray) {
-    var arrayLastDays = getLast5Days();
+/*
+
+DYNAMO DB PARAMS
+
+ */
+
+function generateParams() {
+    let dates = getDaysOfMonth();
+    let loopLength = dates.length;
     var params = getJsonBase();
-    for (var i=0; i<4; i++) {
-        params['RequestItems']['zdashboard']['Keys'][i]['idRelatorio']['S'] = dateArray[i];
+
+    for (var i=0; i<loopLength; i++) {
+        params['RequestItems']['zdashboard']['Keys'].push({'idRelatorio': {'S': dates[i]}});
     }
     return (params);
 }
+
 
 function getJsonBase() {
     var params = {
         RequestItems: {
             "zdashboard": {
-                Keys: [
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    },
-                    {
-                        "idRelatorio":{"S":""}
-                    }
-                ]
+                Keys: []
             }
         }};
     return( params );
 }
 
-function getJsonVega() {
-    var vegaJson = {
-        $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-        width: 300,
-        height: 200,
+
+/*
+
+CHART.JS
+
+ */
+
+function getEmptyBarData(labelText, goalLine) {
+    let data ={
+        type: 'bar',
         data: {
-            values: [
-            ]
+            labels: [],
+            datasets: [{
+                label: labelText,
+                data: [],
+                backgroundColor: 'rgba(214, 236, 251, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
         },
-        mark: 'bar',
-        encoding: {
-            x: {field: '', type: 'ordinal'},
-            y: {field: '', type: 'quantitative'}
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
         }
-    };
-    return (vegaJson);
-}
-
-function generateEmptySalesPlot(){
-    /*
-    creates basic json for the creation
-    of an empty sales chart
-    */
-    // gets date array
-    var dateArray = getLast5Days();
-
-    // gets loop configuration
-    var dateLoopLength = dateArray.length;
-
-    // gets Vega sales' json
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Valor';
-
-    for (var i=0; i<dateLoopLength; i++) {
-        var date = dateArray[i];
-        jsonVega['data']['values'].push({Data: date, Valor: "0"});
     }
-    embed('#salesVis', jsonVega);
+
+    let days = getDaysOfMonth();
+    let arrayLength = days.length;
+    let zerosDays = new Array(arrayLength).fill(0);
+
+    data['data']['labels'] = days;
+    data['data']['datasets'][0]['data'] = zerosDays;
+
+    if (goalLine != 0){
+
+        let emptyLineDataset = {
+            label: 'Objetivo diário',
+            data: [],
+            type: 'line'               
+        }
+
+
+        data['data']['datasets'].push(emptyLineDataset);
+
+    let goalLineArray = new Array(arrayLength).fill(goalLine);
+    data['data']['datasets'][1]['data'] = goalLineArray;
+    } 
+
+    return ( data );
 }
 
-function generateEmptyBilledPlot(){
-    /*
-    creates basic json for the creation
-    of an empty billed chart
-    */
-    // gets date array
-    var dateArray = getLast5Days();
-
-    // gets loop configuration
-    var dateLoopLength = dateArray.length;
-
-    // gets Vega sales' json
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Faturado';
-
-    for (var i=0; i<dateLoopLength; i++) {
-        var date = dateArray[i];
-        jsonVega['data']['values'].push({Data: date, Faturado: "0"});
-    }
-    embed('#billedVis', jsonVega);
+function generateBilledPlot(data) {
+    let ctx = document.getElementById('billedChart').getContext('2d');
+    let barData = getBilledPlotData(data);
+    var newBarChart = new Chart(ctx, barData);
 }
 
-function generateEmptyWeightPlot(){
-    /*
-    creates basic json for the creation
-    of an empty weight chart
-    */
-    // gets date array
-    var dateArray = getLast5Days();
-
-    // gets loop configuration
-    var dateLoopLength = dateArray.length;
-
-    // gets Vega sales' json
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Peso';
-
-    for (var i=0; i<dateLoopLength; i++) {
-        var date = dateArray[i];
-        jsonVega['data']['values'].push({Data: date, Peso: "0"});
-    }
-    embed('#weightVis', jsonVega);
+function generateWeightPlot(data) {
+    let ctx = document.getElementById('weightChart').getContext('2d');
+    let barData = getWeigthPlotData(data);
+    var newBarChart = new Chart(ctx, barData);
 }
 
-function generateSalesPlot(data, dateArray) {
-    // basic plot configuration
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Valor';
+function generateSalesPlot(data) {
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    let barData = getSalesPlotData(data);
+    var newBarChart = new Chart(ctx, barData);
+}
+
+function getBilledPlotData(data){
+    let returnArray = [];
+    let labelText = "Total faturado";
+    let barData = getEmptyBarData(labelText, 6000);
+
+    let days = getDaysOfMonth();
+    let lengthDays = days.length;
 
     // search configuration
-    var innerLoopLength = data['Responses']['zdashboard'].length
-    var dateLoopLength = dateArray.length;
+    let innerLoopLength = data['Responses']['zdashboard'].length;
 
-    for (var i=0; i<dateLoopLength; i++){
+     for (var i=0; i<lengthDays; i++){
         // configuration for search
-        var found = 0;
-        var date = dateArray[i];
+        let found = 0;
+        let date = days[i];
 
-        for (var j=0; j<innerLoopLength; j++){
+        for (let j=0; j<innerLoopLength; j++){
             // if values has already been found skip loop
             if (found == 1) { break;}
 
@@ -173,35 +183,37 @@ function generateSalesPlot(data, dateArray) {
 
             // if match is found add visualization JSON
             if (itemId == date) {
-                var sales = data['Responses']['zdashboard'][j]['totalSold']['S'];
-                jsonVega['data']['values'].push({Data:date, Valor: sales});
+                let billed = data['Responses']['zdashboard'][j]['totalBilled']['S'];
+                returnArray.push(billed);
 
                 found = 1;
             }
         }
         if (found == 0)
-            jsonVega['data']['values'].push({Data:date, Valor: "0"});
+            returnArray.push(0);
     }
+    barData['data']['datasets'][0]['data'] = returnArray;
 
-    embed('#salesVis', jsonVega);
+    return ( barData );
 }
 
-function generateBilledPlot(data, dateArray) {
-    // basic plot configuration
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Faturado';
+function getWeigthPlotData(data){
+    let returnArray = [];
+    let labelText = "Peso faturado";
+    let barData = getEmptyBarData(labelText, 0);
+
+    let days = getDaysOfMonth();
+    let lengthDays = days.length;
 
     // search configuration
-    var innerLoopLength = data['Responses']['zdashboard'].length
-    var dateLoopLength = dateArray.length;
+    let innerLoopLength = data['Responses']['zdashboard'].length;
 
-    for (var i=0; i<dateLoopLength; i++){
+     for (var i=0; i<lengthDays; i++){
         // configuration for search
-        var found = 0;
-        var date = dateArray[i];
+        let found = 0;
+        let date = days[i];
 
-        for (var j=0; j<innerLoopLength; j++){
+        for (let j=0; j<innerLoopLength; j++){
             // if values has already been found skip loop
             if (found == 1) { break;}
 
@@ -210,35 +222,37 @@ function generateBilledPlot(data, dateArray) {
 
             // if match is found add visualization JSON
             if (itemId == date) {
-                var billed = data['Responses']['zdashboard'][j]['totalBilled']['S'];
-                jsonVega['data']['values'].push({Data:date, Faturado: billed});
+                let weight = data['Responses']['zdashboard'][j]['weightBilled']['S'];
+                returnArray.push(weight);
 
                 found = 1;
             }
         }
         if (found == 0)
-            jsonVega['data']['values'].push({Data:date, Faturado: "0"});
+            returnArray.push(0);
     }
+    barData['data']['datasets'][0]['data'] = returnArray;
 
-    embed('#billedVis', jsonVega);
+    return ( barData );
 }
 
-function generateWeightPlot(data, dateArray) {
-    // basic plot configuration
-    var jsonVega = getJsonVega();
-    jsonVega['encoding']['x']['field'] = 'Data';
-    jsonVega['encoding']['y']['field'] = 'Peso';
+function getSalesPlotData(data){
+    let returnArray = [];
+    let labelText = "Vendas mensal";
+    let barData = getEmptyBarData(labelText, 7500);
+
+    let days = getDaysOfMonth();
+    let lengthDays = days.length;
 
     // search configuration
-    var innerLoopLength = data['Responses']['zdashboard'].length
-    var dateLoopLength = dateArray.length;
+    let innerLoopLength = data['Responses']['zdashboard'].length;
 
-    for (var i=0; i<dateLoopLength; i++){
+     for (var i=0; i<lengthDays; i++){
         // configuration for search
-        var found = 0;
-        var date = dateArray[i];
+        let found = 0;
+        let date = days[i];
 
-        for (var j=0; j<innerLoopLength; j++){
+        for (let j=0; j<innerLoopLength; j++){
             // if values has already been found skip loop
             if (found == 1) { break;}
 
@@ -247,23 +261,28 @@ function generateWeightPlot(data, dateArray) {
 
             // if match is found add visualization JSON
             if (itemId == date) {
-                var weight = data['Responses']['zdashboard'][j]['weightBilled']['S'];
-                jsonVega['data']['values'].push({Data:date, Peso: weight});
+                let sold = data['Responses']['zdashboard'][j]['totalSold']['S'];
+                returnArray.push(sold);
 
                 found = 1;
             }
         }
         if (found == 0)
-            jsonVega['data']['values'].push({Data:date, Peso: "0"});
+            returnArray.push(0);
     }
+    barData['data']['datasets'][0]['data'] = returnArray;
 
-    embed('#weightVis', jsonVega);
+    return ( barData );
 }
+/*
+
+DB REQUEST
+
+ */
 
 async function getItens() {
     // configures DB query
-    var dateArray = getLast5Days();
-    var params = generateParams(dateArray);
+    var params = generateParams();
 
     AWS.config.update({region: "us-east-1"});
 
@@ -289,16 +308,17 @@ async function getItens() {
         if (err) {
             console.log("Error", err);
         } else {
-            generateSalesPlot(data, dateArray);
-            generateBilledPlot(data, dateArray);
-            generateWeightPlot(data, dateArray);
+            console.log(data);
+            generateSalesPlot(data);
+            generateBilledPlot(data);
+            generateWeightPlot(data);
         }
     });
 }
 
 document.getElementById('btnSignOut').addEventListener('click', signOut);
 
-generateEmptySalesPlot();
-generateEmptyBilledPlot();
-generateEmptyWeightPlot();
+//generateEmptySalesPlot();
+//generateEmptyBilledPlot();
+//generateEmptyWeightPlot();
 getItens();
