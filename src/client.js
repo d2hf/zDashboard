@@ -91,7 +91,7 @@ CHART.JS
 
  */
 
-function getEmptyBarData(labelText) {
+function getEmptyBarData(labelText, goalLine) {
     let data ={
         type: 'bar',
         data: {
@@ -114,12 +114,28 @@ function getEmptyBarData(labelText) {
             }
         }
     }
+
     let days = getDaysOfMonth();
     let arrayLength = days.length;
     let zerosDays = new Array(arrayLength).fill(0);
 
     data['data']['labels'] = days;
     data['data']['datasets'][0]['data'] = zerosDays;
+
+    if (goalLine != 0){
+
+        let emptyLineDataset = {
+            label: 'Objetivo diário',
+            data: [],
+            type: 'line'               
+        }
+
+
+        data['data']['datasets'].push(emptyLineDataset);
+
+    let goalLineArray = new Array(arrayLength).fill(goalLine);
+    data['data']['datasets'][1]['data'] = goalLineArray;
+    } 
 
     return ( data );
 }
@@ -145,7 +161,7 @@ function generateSalesPlot(data) {
 function getBilledPlotData(data){
     let returnArray = [];
     let labelText = "Total faturado";
-    let barData = getEmptyBarData(labelText);
+    let barData = getEmptyBarData(labelText, 6000);
 
     let days = getDaysOfMonth();
     let lengthDays = days.length;
@@ -184,7 +200,7 @@ function getBilledPlotData(data){
 function getWeigthPlotData(data){
     let returnArray = [];
     let labelText = "Peso faturado";
-    let barData = getEmptyBarData(labelText);
+    let barData = getEmptyBarData(labelText, 0);
 
     let days = getDaysOfMonth();
     let lengthDays = days.length;
@@ -223,7 +239,7 @@ function getWeigthPlotData(data){
 function getSalesPlotData(data){
     let returnArray = [];
     let labelText = "Vendas mensal";
-    let barData = getEmptyBarData(labelText);
+    let barData = getEmptyBarData(labelText, 7500);
 
     let days = getDaysOfMonth();
     let lengthDays = days.length;
