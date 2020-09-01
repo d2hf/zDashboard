@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+
+  pre_build:
+    commands:
+      - echo Installing npm dependencies...
+      - npm install
+
+  build:
+    commands:
+      - echo Running npm run build...
+      - npm run build
+
+artifacts:
+  files:
+    - '**/*'
+
+  base-directory: 'dist/'
