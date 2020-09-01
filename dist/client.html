@@ -15,37 +15,36 @@
 		<button class="btn btn-primary" id="btnSignOut">Sign Out</button>
 	</nav>
 	<div class="container">
+		<br>
+		<div class="card shadow-lg">
+		  <div class="card-body">
+			<h3 class="card-title">Vendas</h4>
+			<h6 class="card-subtitle mb-2 text-muted">Visualize aqui as informações relacionadas as vendas da Bianfer.</h6>
+			<hr class="mt-4 mb-3">
 
-		<div class="row">
-			<h4>Total vendido</h4>
-		</div>
-		<div class="row">
-			<div class="col-6">
-				<div id="salesVis"></div>
+			<div class="col-12">
+    			<h5 class="card-title">Acompanhamento diário de vendas</h4>
+				<canvas id="salesChart"></canvas>
 			</div>
+		  </div>
 		</div>
 		<br>
-
-		<div class="row">
-			<h4>Total faturado</h4>
-		</div>
-		<div class="row">
-			<div class="col-6">
-				<div id="billedVis"></div>
+		<div class="card shadow-lg">
+		  <div class="card-body">
+			<h3 class="card-title">Faturamento</h4>
+			<h6 class="card-subtitle mb-2 text-muted">Visualize aqui as informações relacionadas ao faturamento da Bianfer.</h6>
+			<hr class="mt-4 mb-3">
+	
+			<div class="col-12">
+    			<h4 class="card-title">Valor Faturado</h4>
+				<canvas id="billedChart"></canvas>
 			</div>
-		</div>
-		<br>
-
-		<div class="row">
-			<h4>Peso faturado</h4>
-		</div>
-		<div class="row">
-			<div class="col-6">
-				<div id="weightVis"></div>
+			<div class="col-12" style="margin-top: 2em;">
+    			<h4 class="card-title">Peso Faturado</h4>
+				<canvas id="weightChart"></canvas>
 			</div>
+		  </div>
 		</div>
-	</div>
-
 
 	<script src="client.js"></script>
 </body>
