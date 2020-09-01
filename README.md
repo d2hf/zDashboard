@@ -12,9 +12,11 @@ about the commercial sector of a company.
 4. implement production data viz
 
 ## Tools used
-### AWS applications used:
+### 1. AWS applications used:
 
-1. dynamoDB
+<b>1.1 dynamoDB</b>
+
+<b>1.2 CodePipeline</b>
 
 ### HTML, CSS & JS libraries used
 1. AWS SDK JS

@@ -5,14 +5,19 @@ phases:
     runtime-versions:
       nodejs: 12
 
-pre_build:
-  commands:
-    - npm install
+  pre_build:
+    commands:
+      - echo Installing npm dependencies...
+      - npm install
 
-build:
-  commands:
-    - npm run build
+  build:
+    commands:
+      - echo Running npm run build...
+      - npm run build
 
 artifacts:
   files:
-    - 'dist/*'
+    - '**/*'
+
+  base-directory:
+    - 'dist/'
