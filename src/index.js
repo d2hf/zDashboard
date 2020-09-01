@@ -97,3 +97,7 @@ async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana,
 }
 
 document.getElementById("btnSubmit").addEventListener("click", processForm);
+
+// set date input to today
+const today = new Date().toISOString().slice(0, 10);
+document.getElementById("date").defaultValue = today;
