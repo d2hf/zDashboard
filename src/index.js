@@ -44,8 +44,8 @@ async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana,
 
     var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10', credentials});
 
-    const date = new Date();
-    const timestamp = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
+    const date = document.getElementById("date").value;
+    const timestamp = date.split("-").reverse().join("-");
 
     var params = {
         Item: {
@@ -100,4 +100,4 @@ document.getElementById("btnSubmit").addEventListener("click", processForm);
 
 // set date input to today
 const today = new Date().toISOString().slice(0, 10);
-document.getElementById("date").defaultValue = today;
+document.getElementById("date").value = today;
