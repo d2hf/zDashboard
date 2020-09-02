@@ -8,6 +8,16 @@ Auth.configure({
     identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
 });
 
+async function signOut() {
+    try {
+        await Auth.signOut();
+        redirectLogin();
+    } catch (error) {
+    console.error('Error signing out.');
+    console.error(error);
+    }
+}
+
 function processForm() {
     // retrieves data from forms
     var totalSold = document.getElementById("salesTotal").value;
@@ -96,4 +106,8 @@ async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana,
     });
 }
 
+function redirectLogin (){
+   document.location = 'login.html';
+}
+document.getElementById('btnSignOut').addEventListener('click', signOut);
 document.getElementById("btnSubmit").addEventListener("click", processForm);
