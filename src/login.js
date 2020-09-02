@@ -17,11 +17,15 @@ async function authenticateUser(username, password) {
     try {
         const user = await Auth.signIn(username, password);
         console.log('Sign In successful.');
-        console.log(user);
+        redirectIndex();
     } catch (error) {
         console.error('Error signing in.');
         console.error(error);
     }
+}
+
+function redirectIndex (){
+   document.location = 'index.html';
 }
 
 document.getElementById("btnLogin").addEventListener("click", loginButtonHandler);
