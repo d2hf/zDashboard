@@ -56,6 +56,7 @@ async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana,
 
     const date = document.getElementById("date").value;
     const timestamp = date.split("-").reverse().join("-");
+    console.log(timestamp);
 
     var params = {
         Item: {
