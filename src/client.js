@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import embed from 'vega-embed';
 import Auth from "@aws-amplify/auth";
 import Chart from 'chart.js';
 
