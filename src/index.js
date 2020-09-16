@@ -1,11 +1,24 @@
 import AWS from 'aws-sdk';
 import Auth from '@aws-amplify/auth';
+import Api from "@aws-amplify/api";
 
 Auth.configure({
     region: 'us-east-1',
     userPoolId: 'us-east-1_qxqYDrRYz',
     userPoolWebClientId: '2ghd3u701ls9mc66ht68g4p7cn',
     identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
+});
+
+Api.configure({
+    endpoints: [
+        {
+            name: "ReportsApi",
+            endpoint: "https://wcqz3goash.execute-api.us-east-1.amazonaws.com/dev",
+            custom_header: async () => {
+                return { Authorization: `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}`}
+            }
+        }
+    ]
 });
 
 async function signOut() {
