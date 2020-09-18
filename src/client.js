@@ -332,6 +332,10 @@ function redirectLogin (){
    document.location = 'login.html';
 }
 
+function processData(data){
+    console.log(data['data']);
+}
+
 async function createReport(yearMonth) {
     const apiName = "ReportsApi";
     const path = "";
@@ -344,7 +348,10 @@ async function createReport(yearMonth) {
     };
 
     await API.get(apiName, path, myInit)
-        .then(response => console.log(response))
+        .then(response => {
+            processData(response);
+            console.log(response);
+        })
         .catch(error => console.log(error));
 }
 
