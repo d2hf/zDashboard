@@ -58,7 +58,7 @@ function getDaysOfMonth () {
         // if weekday
         if (d.getDay() != 6 && d.getDay() != 0){
             // gets date info
-            timestamp = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+            timestamp = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
 
             // pushes to array
             dateArray.push( timestamp );
@@ -333,6 +333,10 @@ function redirectLogin (){
 }
 
 function processData(data){
+    /*
+    returns an array with business days of month
+    and data for each day
+     */
     console.log(data['data']);
 }
 
@@ -376,3 +380,4 @@ let month = getMonth();
 let year = getYear();
 
 createReport("oi");
+console.log(getDaysOfMonth ());
