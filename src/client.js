@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import Auth from "@aws-amplify/auth";
-import Api from "@aws-amplify/api";
+import API from "@aws-amplify/api";
 import Chart from 'chart.js';
 
 
@@ -17,13 +17,13 @@ Auth.configure({
     identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
 });
 
-Api.configure({
+API.configure({
     endpoints: [
         {
             name: "ReportsApi",
             endpoint: "https://wcqz3goash.execute-api.us-east-1.amazonaws.com/dev",
             custom_header: async () => {
-                return { Authorization: `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}`}
+                return { Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`}
             }
         }
     ]
@@ -332,9 +332,40 @@ function redirectLogin (){
    document.location = 'login.html';
 }
 
+async function createReport(yearMonth) {
+    const apiName = "ReportsApi";
+    const path = "";
+    const myInit = { // OPTIONAL
+        headers: {}, // OPTIONAL
+        response: true,
+        queryStringParameters: {
+            date: "2020-9",
+        },
+    };
+
+    await API.get(apiName, path, myInit)
+        .then(response => console.log(response))
+        .catch(error => console.log(error));
+}
+
+function getYear(){
+    let date = new Date;
+    return date.getFullYear();
+}
+
+function getMonth(){
+    let date = new Date;
+    return date.getMonth() + 1;
+}
+
 document.getElementById('btnSignOut').addEventListener('click', signOut);
 
 //generateEmptySalesPlot();
 //generateEmptyBilledPlot();
 //generateEmptyWeightPlot();
-getItens();
+//getItens();
+
+let month = getMonth();
+let year = getYear();
+
+createReport("oi");

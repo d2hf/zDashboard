@@ -15,7 +15,7 @@ API.configure({
             name: "ReportsApi",
             endpoint: "https://wcqz3goash.execute-api.us-east-1.amazonaws.com/dev",
             custom_header: async () => {
-                return { Authorization: `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}`}
+                return { Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`}
             }
         }
     ]
