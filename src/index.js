@@ -58,10 +58,9 @@ const getReportFormData = () => {
     };
 };
 
-const getTimestamp = () => {
-    const date = new Date();
-    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-}
+    const date = document.getElementById("date").value;
+    const timestamp = date.split("-").reverse().join("-");
+    console.log(timestamp);
 
 async function createReport(data, createdAt) {
     const apiName = "ReportsApi";

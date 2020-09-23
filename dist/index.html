@@ -34,9 +34,9 @@
 		<h3> Insira aqui os dados!</h3>
 		<br>
 
-		<form>
+		<form class="mb-4">
 
-			<div class="card">
+			<div class="card mb-5">
 			  <div class="card-body">
 				<h4 class="card-title">Dados de vendas</h4>
 				<h6 class="card-subtitle mb-2 text-muted">Insira aqui as informações relacionadas as vendas da Bianfer.</h6>
@@ -106,9 +106,8 @@
 			  </div>
 
 			</div>
-			<br><br>
 
-			<div class="card">
+			<div class="card mb-5">
 			  <div class="card-body">
 				<h4 class="card-title">Dados de faturamento</h4>
 				<h6 class="card-subtitle mb-2 text-muted">Insira aqui as informações relacionadas ao faturamento Bianfer.</h6>
@@ -124,11 +123,21 @@
 				  </div>
 			  </div>
 			</div>
+
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title">Data</h4>
+					<h6 class="card-subtitle mb-3 text-muted">Informe a data</h6>
+
+					<div class="form-group">
+						<input type="date" class="form-control" id="date">
+					</div>
+				</div>
+			</div>
 		</form>
 
 		<button class="btn btn-secondary btn-lg btn-block" id="btnSubmit">Submit</button>
 		<br>
 	</div>
-
 	<script src="index.js"></script>
 </body>
