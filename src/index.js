@@ -49,6 +49,7 @@ function processForm() {
 const getDate = () => {
     let date = document.getElementById("date").value;
     let timestamp = date.split("-").join("-");
+    console.log(timestamp);
     return timestamp;
 }
 
