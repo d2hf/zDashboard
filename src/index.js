@@ -33,41 +33,47 @@ async function signOut() {
 
 function processForm() {
     const formData = getReportFormData();
-    const timestamp = getTimestamp();
+    console.log(formData);
+    //const timestamp = getTimestamp();
 
-    createReport(formData, timestamp)
+    createReport(formData)
         .then(() => {
             console.log("Yay");
         })
-        .catch(() => {
+        .catch((e) => {
             console.error("Boo");
+            console.log(e);
         });
 }
 
+const getDate = () => {
+    let date = document.getElementById("date").value;
+    let timestamp = date.split("-").join("-");
+    return timestamp;
+}
+
 const getReportFormData = () => {
+    let date = getDate();
     return {
-        totalSold: document.getElementById("salesTotal").value,
-        totalBilled: document.getElementById("billedTotal").value,
-        weightBilled: document.getElementById("weightBilled").value,
-        inputJuliana: document.getElementById("inputJuliana").value,
-        inputAnderson: document.getElementById("inputAnderson").value,
-        inputBoaIdeia: document.getElementById("inputBoaIdeia").value,
-        inputFerronato: document.getElementById("inputFerronato").value,
-        inputMaxel: document.getElementById("inputMaxel").value,
-        inputSagrima: document.getElementById("inputSagrima").value
+        createdAt: date,
+        totalBilled: parseFloat(document.getElementById("billedTotal").value),
+        totalSold: parseFloat(document.getElementById("salesTotal").value),
+        weightBilled: parseFloat(document.getElementById("weightBilled").value),
+        inputAnderson: parseFloat(document.getElementById("inputAnderson").value),
+        inputEmpresa: parseFloat(document.getElementById("inputEmpresa").value),
+        inputBoaIdeia: parseFloat(document.getElementById("inputBoaIdeia").value),
+        inputFerronato: parseFloat(document.getElementById("inputFerronato").value),
+        inputJuliana: parseFloat(document.getElementById("inputJuliana").value),
+        inputMaxel: parseFloat(document.getElementById("inputMaxel").value),
+        inputSagrima: parseFloat(document.getElementById("inputSagrima").value),
     };
 };
 
-    const date = document.getElementById("date").value;
-    const timestamp = date.split("-").reverse().join("-");
-    console.log(timestamp);
-
-async function createReport(data, createdAt) {
+async function createReport(data) {
     const apiName = "ReportsApi";
     const path = "";
     const options = {
         body: {
-            createdAt,
             ...data
         }
     }
@@ -80,5 +86,6 @@ async function createReport(data, createdAt) {
 function redirectLogin (){
    document.location = 'login.html';
 }
+
 document.getElementById('btnSignOut').addEventListener('click', signOut);
 document.getElementById("btnSubmit").addEventListener("click", processForm);
