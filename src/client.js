@@ -162,15 +162,14 @@ function getBilledPlotData(data){
     // search configuration
     let innerLoopLength = data.length;
 
-     for (var i=0; i<lengthDays; i++){
+     for (let i=0; i<lengthDays; i++){
         // configuration for search
         let found = 0;
         let date = days[i];
-        date = formatDate(date);
 
         for (let j=0; j<innerLoopLength; j++){
             // gets is from DB response for comparsion
-            var createdAt = data[j]['createdAt'];
+            let createdAt = data[j]['createdAt'];
 
             // if match is found add visualization JSON
             if (createdAt == date) {
@@ -204,7 +203,6 @@ function getSalesPlotData(data){
         // configuration for search
         let found = 0;
         let date = days[i];
-        date = formatDate(date);
 
         for (let j=0; j<innerLoopLength; j++){
             // if values has already been found skip loop
@@ -232,7 +230,7 @@ function getSalesPlotData(data){
 function getWeigthPlotData(data){
     let returnArray = [];
     let labelText = "Peso Faturado";
-    let barData = getEmptyBarData(labelText, 6000);
+    let barData = getEmptyBarData(labelText, 500);
 
     let days = getDaysOfMonth();
     let lengthDays = days.length;
@@ -244,7 +242,6 @@ function getWeigthPlotData(data){
         // configuration for search
         let found = 0;
         let date = days[i];
-        date = formatDate(date);
 
         for (let j=0; j<innerLoopLength; j++){
             // if values has already been found skip loop
