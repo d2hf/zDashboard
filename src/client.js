@@ -25,7 +25,7 @@ API.configure({
             }
         }
     ]
-});
+})
 
 async function signOut() {
     try {
@@ -289,9 +289,9 @@ async function createReport(yearMonth) {
 
     await API.get(apiName, path, myInit)
         .then(response => {
-            generateBilledPlot(response.data);
-            generateSalesPlot(response.data);
-            generateWeightPlot(response.data);
+            generateBilledPlot(response.data.dailyReports);
+            generateSalesPlot(response.data.dailyReports);
+            generateWeightPlot(response.data.dailyReports);
 
         })
         .catch(error => console.log(error));
