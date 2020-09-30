@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import embed from 'vega-embed';
 import Auth from "@aws-amplify/auth";
 import Chart from 'chart.js';
 
@@ -20,6 +19,7 @@ Auth.configure({
 async function signOut() {
     try {
         await Auth.signOut();
+        redirectLogin();
     } catch (error) {
     console.error('Error signing out.');
     console.error(error);
@@ -314,6 +314,9 @@ async function getItens() {
             generateWeightPlot(data);
         }
     });
+}
+function redirectLogin (){
+   document.location = 'login.html';
 }
 
 document.getElementById('btnSignOut').addEventListener('click', signOut);
