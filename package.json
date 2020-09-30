@@ -23,11 +23,9 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "@aws-amplify/api": "^3.2.3",
     "@aws-amplify/auth": "^3.3.5",
     "aws-sdk": "^2.738.0",
-    "chart.js": "^2.9.3",
-    "vega": "^5.14.0",
-    "vega-embed": "^6.11.1",
-    "vega-lite": "^4.14.1"
+    "chart.js": "^2.9.3"
   }
 }
