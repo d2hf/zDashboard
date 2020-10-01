@@ -1,5 +1,7 @@
 import Auth from "@aws-amplify/auth";
 import API from "@aws-amplify/api";
+import {signOut} from './user-activity/logout.js'
+import {getBarPlotData, generatePlot} from  './plot/data.js'
 import Chart from 'chart.js';
 
 /*
@@ -26,16 +28,6 @@ API.configure({
         }
     ]
 })
-
-async function signOut() {
-    try {
-        await Auth.signOut();
-        redirectLogin();
-    } catch (error) {
-    console.error('Error signing out.');
-    console.error(error);
-    }
-}
 
 function getDaysOfMonth () {
     // set output data for function
@@ -78,203 +70,6 @@ function formatDate(date) {
 
     return [year, month, day].join('-');
 }
-/*
-
-CHART.JS
-
- */
-
-function getEmptyBarData(labelText, goalLine) {
-    let data ={
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: labelText,
-                data: [],
-                backgroundColor: 'rgba(214, 236, 251, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    }
-
-    let days = getDaysOfMonth();
-    let arrayLength = days.length;
-    let zerosDays = new Array(arrayLength).fill(0);
-
-    data['data']['labels'] = days;
-    data['data']['datasets'][0]['data'] = zerosDays;
-
-    if (goalLine != 0){
-
-        let emptyLineDataset = {
-            label: 'Objetivo diário',
-            data: [],
-            type: 'line'               
-        }
-
-
-        data['data']['datasets'].push(emptyLineDataset);
-
-    let goalLineArray = new Array(arrayLength).fill(goalLine);
-    data['data']['datasets'][1]['data'] = goalLineArray;
-    } 
-
-    return ( data );
-}
-
-function generateBilledPlot(daily_sales) {
-    let ctx = document.getElementById('billedChart').getContext('2d');
-    let barData = getBilledPlotData(daily_sales);
-    var newBarChart = new Chart(ctx, barData);
-}
-
-function generateSalesPlot(daily_sales) {
-    var ctx = document.getElementById('salesChart').getContext('2d');
-    let barData = getSalesPlotData(daily_sales);
-    var newBarChart = new Chart(ctx, barData);
-}
-
-function generateWeightPlot(daily_sales) {
-    let ctx = document.getElementById('weightChart').getContext('2d');
-    let barData = getWeigthPlotData(daily_sales);
-    var newBarChart = new Chart(ctx, barData);
-}
-
-function getBilledPlotData(data){
-    let returnArray = [];
-    let labelText = "Total faturado";
-    let barData = getEmptyBarData(labelText, 6000);
-
-    let days = getDaysOfMonth();
-    let lengthDays = days.length;
-
-    // search configuration
-    let innerLoopLength = data.length;
-
-     for (let i=0; i<lengthDays; i++){
-        // configuration for search
-        let found = 0;
-        let date = days[i];
-
-        for (let j=0; j<innerLoopLength; j++){
-            // gets is from DB response for comparsion
-            let createdAt = data[j]['createdAt'];
-
-            // if match is found add visualization JSON
-            if (createdAt == date) {
-                let billed = data[j]['totalBilled'];
-                returnArray.push(billed);
-
-                found = 1;
-                break;
-            }
-        }
-        if (found == 0)
-            returnArray.push(0);
-    }
-    barData['data']['datasets'][0]['data'] = returnArray;
-
-    return ( barData );
-}
-
-function getSalesPlotData(data){
-    let returnArray = [];
-    let labelText = "Venda Mensal";
-    let barData = getEmptyBarData(labelText, 6000);
-
-    let days = getDaysOfMonth();
-    let lengthDays = days.length;
-
-    // search configuration
-    let innerLoopLength = data.length;
-
-    for (var i=0; i<lengthDays; i++){
-        // configuration for search
-        let found = 0;
-        let date = days[i];
-
-        for (let j=0; j<innerLoopLength; j++){
-            // if values has already been found skip loop
-            if (found == 1) { break;}
-
-            // gets is from DB response for comparsion
-            var createdAt = data[j]['createdAt'];
-
-            // if match is found add visualization JSON
-            if (createdAt == date) {
-                let billed = data[j]['totalSold'];
-                returnArray.push(billed);
-
-                found = 1;
-            }
-        }
-        if (found == 0)
-            returnArray.push(0);
-    }
-    barData['data']['datasets'][0]['data'] = returnArray;
-
-    return ( barData );
-}
-
-function getWeigthPlotData(data){
-    let returnArray = [];
-    let labelText = "Peso Faturado";
-    let barData = getEmptyBarData(labelText, 500);
-
-    let days = getDaysOfMonth();
-    let lengthDays = days.length;
-
-    // search configuration
-    let innerLoopLength = data.length;
-
-    for (var i=0; i<lengthDays; i++){
-        // configuration for search
-        let found = 0;
-        let date = days[i];
-
-        for (let j=0; j<innerLoopLength; j++){
-            // if values has already been found skip loop
-            if (found == 1) { break;}
-
-            // gets is from DB response for comparsion
-            var createdAt = data[j]['createdAt'];
-
-            // if match is found add visualization JSON
-            if (createdAt == date) {
-                let billed = data[j]['weightBilled'];
-                returnArray.push(billed);
-
-                found = 1;
-            }
-        }
-        if (found == 0)
-            returnArray.push(0);
-    }
-    barData['data']['datasets'][0]['data'] = returnArray;
-
-    return ( barData );
-}
-/* *********************************************************************************** */
-/* *********************************************************************************** */
-/* *********************************************************************************** */
-/* *********************************************************************************** */
-
-
-function redirectLogin (){
-   document.location = 'login.html';
-}
-
 
 async function createReport(yearMonth) {
     const apiName = "ReportsApi";
@@ -289,9 +84,31 @@ async function createReport(yearMonth) {
 
     await API.get(apiName, path, myInit)
         .then(response => {
-            generateBilledPlot(response.data.dailyReports);
-            generateSalesPlot(response.data.dailyReports);
-            generateWeightPlot(response.data.dailyReports);
+
+            let days = getDaysOfMonth();
+            generatePlot(response.data.dailyReports,
+                        "createdAt",
+                        "totalBilled",
+                        "Total Faturado",
+                        5000,
+                        'billedChart',
+                        days);
+
+            generatePlot(response.data.dailyReports,
+                "createdAt",
+                "totalBilled",
+                "Total Faturado",
+                5000,
+                'salesChart',
+                days);
+
+            generatePlot(response.data.dailyReports,
+                "createdAt",
+                "weightBilled",
+                "Peso Faturado",
+                500,
+                'weightChart',
+                days);
 
         })
         .catch(error => console.log(error));
