@@ -80,9 +80,9 @@ async function createReport(data) {
     }
 
     await API.post(apiName, path, options)
-        .then(response => (){
-        document.location.reload(true);
-
+        .then(response => {
+            window.scroll(0,0);
+            document.location.reload(true);
         }
         )
         .catch(error => console.log(error));

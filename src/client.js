@@ -3,6 +3,7 @@ import API from "@aws-amplify/api";
 import {signOut} from './user-activity/logout.js';
 import {generatePlot} from  './plot/data.js';
 import {getDaysOfMonth, getYearMonth} from "./date-handler/dates-extracts";
+import {allOverlaysOff} from "./stylers/edit-style";
 
 /*
 
@@ -42,7 +43,7 @@ async function createReport(yearMonth) {
 
     await API.get(apiName, path, myInit)
         .then(response => {
-
+            allOverlaysOff("my-overlay");
             let days = getDaysOfMonth();
             generatePlot(response.data.dailyReports,
                         "createdAt",
