@@ -1,8 +1,8 @@
 import Auth from "@aws-amplify/auth";
 import API from "@aws-amplify/api";
-import {signOut} from './user-activity/logout.js'
-import {getBarPlotData, generatePlot} from  './plot/data.js'
-import Chart from 'chart.js';
+import {signOut} from './user-activity/logout.js';
+import {generatePlot} from  './plot/data.js';
+import {getDaysOfMonth, getYearMonth} from "./date-handler/dates-extracts";
 
 /*
 
@@ -29,48 +29,6 @@ API.configure({
     ]
 })
 
-function getDaysOfMonth () {
-    // set output data for function
-    let dateArray = [];
-    let timestamp;
-
-    // set date params for loop
-    let actualDate = new Date();
-    let month = actualDate.getMonth();
-    let year = actualDate.getFullYear();
-
-    // gets first day of current month
-    let d = new Date(year, month, 1);
-
-    // iterates over dates
-    // if weekday push to vector
-    while (d.getMonth() === month){
-        // if weekday
-        if (d.getDay() != 6 && d.getDay() != 0){
-
-            // pushes to array
-            dateArray.push( formatDate(d) );
-        }
-        // gets next date
-        d.setDate(d.getDate() + 1);
-    }
-    return (dateArray);
-}
-
-function formatDate(date) {
-    let d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2)
-        month = '0' + month;
-    if (day.length < 2)
-        day = '0' + day;
-
-    return [year, month, day].join('-');
-}
-
 async function createReport(yearMonth) {
     const apiName = "ReportsApi";
     const path = "";
@@ -78,7 +36,7 @@ async function createReport(yearMonth) {
         headers: {}, // OPTIONAL
         response: true,
         queryStringParameters: {
-            date: "2020-9",
+            date: yearMonth,
         },
     };
 
@@ -114,19 +72,7 @@ async function createReport(yearMonth) {
         .catch(error => console.log(error));
 }
 
-function getYear(){
-    let date = new Date;
-    return date.getFullYear();
-}
-
-function getMonth(){
-    let date = new Date;
-    return date.getMonth() + 1;
-}
-
 document.getElementById('btnSignOut').addEventListener('click', signOut);
 
-let month = getMonth();
-let year = getYear();
 
-createReport("oi");
+createReport(getYearMonth());
