@@ -5,12 +5,6 @@ import {generatePlot} from  './plot/data.js';
 import {getDaysOfMonth, getYearMonth} from "./date-handler/dates-extracts";
 import {allOverlaysOff} from "./stylers/edit-style";
 
-/*
-
-GENERAL CONFIGURATION
-
- */
-
 Auth.configure({
     region: 'us-east-1',
     userPoolId: 'us-east-1_qxqYDrRYz',
@@ -47,10 +41,10 @@ async function createReport(yearMonth) {
             let days = getDaysOfMonth();
             generatePlot(response.data.dailyReports,
                         "createdAt",
-                        "totalBilled",
-                        "Total Faturado",
+                        "totalSold",
+                        "Total Vendido",
                         5000,
-                        'billedChart',
+                        'salesChart',
                         days);
 
             generatePlot(response.data.dailyReports,
@@ -58,7 +52,7 @@ async function createReport(yearMonth) {
                 "totalBilled",
                 "Total Faturado",
                 5000,
-                'salesChart',
+                'billedChart',
                 days);
 
             generatePlot(response.data.dailyReports,

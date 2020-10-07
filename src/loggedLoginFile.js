@@ -1,4 +1,5 @@
 import Auth from '@aws-amplify/auth';
+import {redirectIndex} from "./user-activity/redirections";
 
 Auth.configure({
     region: 'us-east-1',
@@ -19,7 +20,3 @@ loginIsLogged().then(function (value) {
     if (value)
         redirectIndex();
 });
-
-function redirectIndex (){
-   document.location = 'index.html';
-}

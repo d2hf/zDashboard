@@ -1,4 +1,5 @@
 import Auth from "@aws-amplify/auth";
+import {redirectLogin} from './redirections.js'
 
 export async function signOut() {
     try {
@@ -8,9 +9,4 @@ export async function signOut() {
         console.error('Error signing out.');
         console.error(error);
     }
-}
-
-
-function redirectLogin () {
-    document.location = 'login.html';
 }
