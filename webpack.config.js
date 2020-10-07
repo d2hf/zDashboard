@@ -4,7 +4,8 @@ module.exports = {
         client: "./src/client.js",
         login: "./src/login.js",
         logged: "./src/logged.js",
-        loggedLoginFile: "./src/loggedLoginFile.js"
+        loggedLoginFile: "./src/loggedLoginFile.js",
+        signup: "./src/signup.js"
     },
     output: {
         filename: "[name].js",
