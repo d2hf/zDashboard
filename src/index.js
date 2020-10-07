@@ -1,11 +1,24 @@
 import AWS from 'aws-sdk';
 import Auth from '@aws-amplify/auth';
+import API from "@aws-amplify/api";
 
 Auth.configure({
     region: 'us-east-1',
     userPoolId: 'us-east-1_qxqYDrRYz',
     userPoolWebClientId: '2ghd3u701ls9mc66ht68g4p7cn',
     identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
+});
+
+API.configure({
+    endpoints: [
+        {
+            name: "ReportsApi",
+            endpoint: "https://wcqz3goash.execute-api.us-east-1.amazonaws.com/dev",
+            custom_header: async () => {
+                return { Authorization: `Bearer ${(await Auth.currentSession()).getIdToken().getJwtToken()}`}
+            }
+        }
+    ]
 });
 
 async function signOut() {
@@ -19,95 +32,65 @@ async function signOut() {
 }
 
 function processForm() {
-    // retrieves data from forms
-    var totalSold = document.getElementById("salesTotal").value;
-    var totalBilled = document.getElementById("billedTotal").value;
-    var weightBilled = document.getElementById("weightBilled").value;
-    var inputJuliana = document.getElementById("inputJuliana").value;
-    var inputAnderson = document.getElementById("inputAnderson").value;
-    var inputBoaIdeia = document.getElementById("inputBoaIdeia").value;
-    var inputFerronato = document.getElementById("inputFerronato").value;
-    var inputMaxel = document.getElementById("inputMaxel").value;
-    var inputSagrima = document.getElementById("inputSagrima").value;
+    const formData = getReportFormData();
+    console.log(formData);
+    //const timestamp = getTimestamp();
 
-
-    // adds data to dynamoDB
-    putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana, inputBianfer, inputAnderson,
-        inputBoaIdeia, inputFerronato, inputMaxel, inputSagrima);
+    createReport(formData)
+        .then(() => {
+            console.log("Yay");
+        })
+        .catch((e) => {
+            console.error("Boo");
+            console.log(e);
+        });
 }
 
-async function putInDataBase(totalSold, totalBilled, weightBilled, inputJuliana, inputBianfer,
-                             inputAnderson, inputBoaIdeia, inputFerronato, inputMaxel, inputSagrima) {
-    AWS.config.update({region: "us-east-1"});
+const getDate = () => {
+    let date = document.getElementById("date").value;
+    let timestamp = date.split("-").join("-");
+    console.log(timestamp);
+    return timestamp;
+}
 
-    try {
-        const user = await Auth.currentCredentials();
-        var credentials = new AWS.Credentials({
-            accessKeyId: user.accessKeyId,
-            secretAccessKey: user.secretAccessKey,
-            sessionToken: user.sessionToken
-        });
-    } catch (err) {
-        console.error('Unable to retrieve credentials.');
-        console.error(err);
+const getReportFormData = () => {
+    let date = getDate();
+    return {
+        createdAt: date,
+        totalBilled: parseFloat(document.getElementById("billedTotal").value),
+        totalSold: parseFloat(document.getElementById("salesTotal").value),
+        weightBilled: parseFloat(document.getElementById("weightBilled").value),
+        inputAnderson: parseFloat(document.getElementById("inputAnderson").value),
+        inputEmpresa: parseFloat(document.getElementById("inputEmpresa").value),
+        inputBoaIdeia: parseFloat(document.getElementById("inputBoaIdeia").value),
+        inputFerronato: parseFloat(document.getElementById("inputFerronato").value),
+        inputJuliana: parseFloat(document.getElementById("inputJuliana").value),
+        inputMaxel: parseFloat(document.getElementById("inputMaxel").value),
+        inputSagrima: parseFloat(document.getElementById("inputSagrima").value),
+    };
+};
+
+async function createReport(data) {
+    const apiName = "ReportsApi";
+    const path = "";
+    const options = {
+        body: {
+            ...data
+        }
     }
 
-    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10', credentials});
-
-    const date = new Date();
-    const timestamp = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
-
-    var params = {
-        Item: {
-            "idRelatorio": {
-                S: timestamp
-            },
-            "totalSold": {
-                S: totalSold.toString()
-            },
-            "totalBilled": {
-                S: totalBilled.toString()
-            },
-            "weightBilled": {
-                S: weightBilled.toString()
-            },
-            "createdAt": {
-                S: timestamp
-            },
-            "inputJuliana": {
-                S: inputJuliana.toString()
-            },
-            "inputBianfer": {
-                S: inputBianfer.toString()
-            },
-            "inputAnderson": {
-                S: inputAnderson.toString()
-            },
-            "inputBoaIdeia": {
-                S: inputBoaIdeia.toString()
-            },
-            "inputFerronato": {
-                S: inputFerronato.toString()
-            },
-            "inputMaxel": {
-                S: inputMaxel.toString()
-            },
-            "inputSagrima": {
-                S: inputMaxel.toString()
-            },
-        },
-        ReturnConsumedCapacity: "TOTAL",
-        TableName: "zdashboard"
-    };
-
-    dynamodb.putItem(params, function(err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else console.log(data);           // successful response
-    });
+    await API.post(apiName, path, options)
+        .then(response => {
+            window.scroll(0,0);
+            document.location.reload(true);
+        }
+        )
+        .catch(error => console.log(error));
 }
 
 function redirectLogin (){
    document.location = 'login.html';
 }
+
 document.getElementById('btnSignOut').addEventListener('click', signOut);
 document.getElementById("btnSubmit").addEventListener("click", processForm);

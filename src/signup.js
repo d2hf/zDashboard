@@ -1,33 +1,53 @@
-import Auth from "@aws-amplify/auth";
+import Auth from '@aws-amplify/auth';
+import {redirectLogin, redirectIndex} from "./user-activity/redirections";
 
 Auth.configure({
     region: 'us-east-1',
     userPoolId: 'us-east-1_qxqYDrRYz',
     userPoolWebClientId: '2ghd3u701ls9mc66ht68g4p7cn',
-    identityPoolId: 'us-east-1:716e44bc-2e9a-4ff9-afd9-a6ecdfb2d21a',
 });
 
-function signUpButtonHandler() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    signUpUser(email, password);
-}
+function loginButtonHandler() {
+    const username = document.getElementById("username").value;
+    const old_password = document.getElementById("old-password").value;
+    const new_password1 = document.getElementById("new-password1").value;
+    const new_password2 = document.getElementById("new-password2").value;
 
-async function signUpUser(email, password) {
-    try {
-        const { user } = await Auth.signUp({
-            username: email,
-            password,
-            attributes: {
-                email
-            }
-        });
-        console.log('Sign up successful.');
-        console.log(user);
-    } catch (error) {
-        console.error('Error signing up.');
-        console.error(error);
+    if (new_password1 === new_password2)
+        authenticateChangePassword(username, old_password, new_password1);
+    else{
+        console.log('login failed, input correct password');
+
+        // changes html for UX
+        let alert = document.getElementById("failed-newpass");
+        alert.style.display = "block";
     }
 }
 
-document.getElementById("btnSignUp").addEventListener("click", signUpButtonHandler);
+async function authenticateChangePassword(username, oldPassword, newPassword) {
+    try {
+        const user = await Auth.signIn(username, oldPassword);
+
+        if (user.challengeName === 'NEW_PASSWORD_REQUIRED')
+            Auth.completeNewPassword(
+                user,               // the Cognito User Object
+                newPassword,       // the new password
+            ).then(user => {
+                redirectIndex();
+            }).catch(e => {
+                console.log(e);
+            });
+        else
+            redirectLogin();
+
+    } catch (error) {
+        console.error('Error signing in.');
+        console.error(error);
+
+        // changes html for UX
+        let alert = document.getElementById("failed-login");
+        alert.style.display = "block";
+    }
+}
+
+document.getElementById("btnLogin").addEventListener("click", loginButtonHandler);
