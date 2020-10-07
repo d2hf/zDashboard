@@ -17,7 +17,10 @@ async function authenticateUser(username, password) {
     try {
         const user = await Auth.signIn(username, password);
         console.log('Sign In successful.');
-        redirectIndex();
+        if (user.challengeName === 'NEW_PASSWORD_REQUIRED')
+            console.log(user);
+        else
+            redirectIndex();
     } catch (error) {
         console.error('Error signing in.');
         console.error(error);
