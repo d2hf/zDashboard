@@ -11,12 +11,17 @@ function loginButtonHandler() {
     const username = document.getElementById("username").value;
     const old_password = document.getElementById("old-password").value;
     const new_password1 = document.getElementById("new-password1").value;
-    const new_password2 = document.getElementById("new-password1").value;
+    const new_password2 = document.getElementById("new-password2").value;
 
     if (new_password1 === new_password2)
         authenticateChangePassword(username, old_password, new_password1);
-    else
+    else{
         console.log('login failed, input correct password');
+
+        // changes html for UX
+        let alert = document.getElementById("failed-newpass");
+        alert.style.display = "block";
+    }
 }
 
 async function authenticateChangePassword(username, oldPassword, newPassword) {
@@ -38,6 +43,10 @@ async function authenticateChangePassword(username, oldPassword, newPassword) {
     } catch (error) {
         console.error('Error signing in.');
         console.error(error);
+
+        // changes html for UX
+        let alert = document.getElementById("failed-login");
+        alert.style.display = "block";
     }
 }
 

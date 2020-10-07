@@ -29,7 +29,7 @@ async function authenticateUser(username, password) {
         console.error(error);
 
         // changes html for UX
-        let alert = document.getElementById("alert");
+        let alert = document.getElementById("failed-login");
         alert.style.display = "block";
     }
 }
