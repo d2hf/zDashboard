@@ -1,4 +1,5 @@
 import Auth from '@aws-amplify/auth';
+import {redirectIndex, redirectSignup} from "./user-activity/redirections";
 
 Auth.configure({
     region: 'us-east-1',
@@ -15,20 +16,22 @@ function loginButtonHandler() {
 
 async function authenticateUser(username, password) {
     try {
+        // authenticates at AWS
         const user = await Auth.signIn(username, password);
-        console.log('Sign In successful.');
+
+        // checks if is necessary to change password
         if (user.challengeName === 'NEW_PASSWORD_REQUIRED')
-            console.log(user);
+            redirectSignup();
         else
             redirectIndex();
     } catch (error) {
         console.error('Error signing in.');
         console.error(error);
-    }
-}
 
-function redirectIndex (){
-   document.location = 'index.html';
+        // changes html for UX
+        let alert = document.getElementById("alert");
+        alert.style.display = "block";
+    }
 }
 
 document.getElementById("btnLogin").addEventListener("click", loginButtonHandler);

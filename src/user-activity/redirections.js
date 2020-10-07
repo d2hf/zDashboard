@@ -5,3 +5,7 @@ export function redirectLogin () {
 export function redirectIndex (){
     document.location = 'index.html';
 }
+
+export function redirectSignup(){
+    document.location = 'signup.html';
+}

@@ -9,3 +9,7 @@
     z-index: 2;
     cursor: pointer;
 }
+
+#alert{
+    display: none;
+}
