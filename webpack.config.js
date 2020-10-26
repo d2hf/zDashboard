@@ -1,4 +1,5 @@
 module.exports = {
+    mode: 'development',
     entry: {
         index: "./src/index.js",
         client: "./src/client.js",
@@ -10,5 +11,5 @@ module.exports = {
     output: {
         filename: "[name].js",
         path: __dirname + "/dist/js"
-    }
+    },
 };
