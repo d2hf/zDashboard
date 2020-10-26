@@ -8,6 +8,7 @@ module.exports = {
         loggedLoginFile: "./src/loggedLoginFile.js",
         signup: "./src/signup.js"
     },
+    devtool: 'inline-source-map',
     output: {
         filename: "[name].js",
         path: __dirname + "/dist/js"
