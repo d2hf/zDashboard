@@ -67,6 +67,10 @@ const getReportFormData = () => {
         inputJuliana: parseFloat(document.getElementById("inputJuliana").value),
         inputMaxel: parseFloat(document.getElementById("inputMaxel").value),
         inputSagrima: parseFloat(document.getElementById("inputSagrima").value),
+        inputQuartile1: parseInt(document.getElementById("inputQuartile1").value),
+        inputQuartile2: parseInt(document.getElementById("inputQuartile2").value),
+        inputQuartile3: parseInt(document.getElementById("inputQuartile3").value),
+        inputQuartile4: parseInt(document.getElementById("inputQuartile4").value),
     };
 };
 

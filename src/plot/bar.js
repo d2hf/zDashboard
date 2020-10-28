@@ -1,6 +1,6 @@
 import Chart from "chart.js";
 
-export function generatePlot(data, xKey, yKey, yDescription, yTarget, elementId, xLabels){
+export function generateBarPlot(data, xKey, yKey, yDescription, yTarget, elementId, xLabels){
     let ctx = document.getElementById(elementId).getContext('2d');
     let barData = getBarPlotData(data, xKey, yKey,
         xLabels, yDescription, yTarget);

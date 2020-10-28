@@ -1,9 +1,10 @@
 import Auth from "@aws-amplify/auth";
 import API from "@aws-amplify/api";
 import {signOut} from './user-activity/logout.js';
-import {generatePlot} from  './plot/data.js';
+import {generateBarPlot} from './plot/bar.js';
 import {getDaysOfMonth, getYearMonth} from "./date-handler/dates-extracts";
 import {allOverlaysOff} from "./stylers/edit-style";
+import {generateQuartilePlot} from "./plot/line";
 
 Auth.configure({
     region: 'us-east-1',
@@ -35,11 +36,12 @@ async function createReport(yearMonth) {
         },
     };
 
+    // pede dados na aws
     await API.get(apiName, path, myInit)
         .then(response => {
             allOverlaysOff("my-overlay");
             let days = getDaysOfMonth();
-            generatePlot(response.data.dailyReports,
+            generateBarPlot(response.data.dailyReports,
                         "createdAt",
                         "totalSold",
                         "Total Vendido",
@@ -47,7 +49,7 @@ async function createReport(yearMonth) {
                         'salesChart',
                         days);
 
-            generatePlot(response.data.dailyReports,
+            generateBarPlot(response.data.dailyReports,
                 "createdAt",
                 "totalBilled",
                 "Total Faturado",
@@ -55,13 +57,20 @@ async function createReport(yearMonth) {
                 'billedChart',
                 days);
 
-            generatePlot(response.data.dailyReports,
+            generateBarPlot(response.data.dailyReports,
                 "createdAt",
                 "weightBilled",
                 "Peso Faturado",
                 500,
                 'weightChart',
                 days);
+
+            generateQuartilePlot(response.data.dailyReports,
+                "createdAt",
+                "Atraso pedidos",
+                "delayDays",
+                days
+                )
 
         })
         .catch(error => console.log(error));
